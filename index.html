@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Fer Walk v1.0</title>
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<style>
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#10131a;
+    color:white;
+    overflow:hidden;
+}
+
+header{
+    height:70px;
+    background:linear-gradient(135deg,#10131a,#1b222d);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 18px;
+    position:relative;
+    z-index:1000;
+    box-shadow:0 3px 15px rgba(0,0,0,.35);
+}
+
+.logo{
+    font-size:23px;
+    font-weight:900;
+    letter-spacing:.5px;
+}
+
+.logo span{
+    color:#35e58b;
+}
+
+.status{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:13px;
+    color:#aaa;
+}
+
+.dot{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#777;
+}
+
+.dot.active{
+    background:#35e58b;
+    box-shadow:0 0 10px #35e58b;
+}
+
+#map{
+    position:absolute;
+    top:70px;
+    bottom:245px;
+    left:0;
+    right:0;
+    z-index:1;
+}
+
+.panel{
+    position:absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    height:245px;
+    background:rgba(16,19,26,.97);
+    border-radius:25px 25px 0 0;
+    padding:18px;
+    z-index:1000;
+    box-shadow:0 -8px 30px rgba(0,0,0,.35);
+}
+
+.handle{
+    width:45px;
+    height:5px;
+    border-radius:10px;
+    background:#444;
+    margin:-5px auto 15px;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.stat{
+    background:#1c232d;
+    border-radius:15px;
+    padding:12px 7px;
+    text-align:center;
+}
+
+.stat small{
+    display:block;
+    color:#888;
+    font-size:11px;
+    margin-bottom:5px;
+}
+
+.stat strong{
+    font-size:19px;
+}
+
+.unit{
+    font-size:11px;
+    color:#777;
+}
+
+.controls{
+    display:flex;
+    gap:10px;
+    margin-top:15px;
+}
+
+button{
+    border:0;
+    border-radius:15px;
+    padding:15px;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+#startBtn{
+    flex:1;
+    background:#35e58b;
+    color:#07150e;
+}
+
+#pauseBtn{
+    width:80px;
+    background:#f0b429;
+    color:#17120a;
+    display:none;
+}
+
+#stopBtn{
+    width:80px;
+    background:#e74c3c;
+    color:white;
+    display:none;
+}
+
+button:disabled{
+    opacity:.45;
+}
+
+.message{
+    text-align:center;
+    margin-top:10px;
+    color:#777;
+    font-size:12px;
+}
+
+.leaflet-control-attribution{
+    font-size:9px;
+}
+
+.locate{
+    position:absolute;
+    right:15px;
+    bottom:265px;
+    z-index:1000;
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    background:#1c232d;
+    color:white;
+    box-shadow:0 4px 15px rgba(0,0,0,.35);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+}
+
+.summary{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.78);
+    backdrop-filter:blur(8px);
+    z-index:3000;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.summary-card{
+    width:100%;
+    max-width:430px;
+    background:#171c24;
+    border-radius:25px;
+    padding:25px;
+    text-align:center;
+    box-shadow:0 15px 50px rgba(0,0,0,.5);
+}
+
+.summary-card h2{
+    margin-top:0;
+    color:#35e58b;
+}
+
+.summary-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin:20px 0;
+}
+
+.summary-item{
+    background:#222934;
+    padding:15px;
+    border-radius:15px;
+}
+
+.summary-item small{
+    display:block;
+    color:#888;
+    margin-bottom:5px;
+}
+
+#closeSummary{
+    width:100%;
+    background:#35e58b;
+}
+
+@media(max-height:650px){
+    #map{
+        bottom:220px;
+    }
+
+    .panel{
+        height:220px;
+    }
+
+    .locate{
+        bottom:235px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">🚶 <span>Fer</span> Walk</div>
+
+    <div class="status">
+        <div id="statusDot" class="dot"></div>
+        <span id="statusText">GPS inactivo</span>
+    </div>
+</header>
+
+<div id="map"></div>
+
+<button class="locate" id="locateBtn">⌖</button>
+
+<section class="panel">
+
+    <div class="handle"></div>
+
+    <div class="stats">
+
+        <div class="stat">
+            <small>DISTANCIA</small>
+            <strong id="distance">0.00</strong>
+            <span class="unit">km</span>
+        </div>
+
+        <div class="stat">
+            <small>TIEMPO</small>
+            <strong id="time">00:00</strong>
+        </div>
+
+        <div class="stat">
+            <small>VELOCIDAD</small>
+            <strong id="speed">0.0</strong>
+            <span class="unit">km/h</span>
+        </div>
+
+    </div>
+
+    <div class="controls">
+
+        <button id="startBtn">
+            ▶ Iniciar caminata
+        </button>
+
+        <button id="pauseBtn">
+            ⏸
+        </button>
+
+        <button id="stopBtn">
+            ■
+        </button>
+
+    </div>
+
+    <div class="message" id="message">
+        Pulsa "Iniciar caminata" para comenzar.
+    </div>
+
+</section>
+
+<div class="summary" id="summary">
+
+    <div class="summary-card">
+
+        <h2>🎉 Caminata terminada</h2>
+
+        <div class="summary-grid">
+
+            <div class="summary-item">
+                <small>Distancia</small>
+                <strong id="finalDistance">0 km</strong>
+            </div>
+
+            <div class="summary-item">
+                <small>Tiempo</small>
+                <strong id="finalTime">00:00</strong>
+            </div>
+
+            <div class="summary-item">
+                <small>Velocidad media</small>
+                <strong id="finalSpeed">0 km/h</strong>
+            </div>
+
+            <div class="summary-item">
+                <small>Puntos GPS</small>
+                <strong id="finalPoints">0</strong>
+            </div>
+
+        </div>
+
+        <button id="closeSummary">
+            Cerrar
+        </button>
+
+    </div>
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+/* =========================================
+   FER WALK v1.0
+   ========================================= */
+
+let map;
+let routeLine;
+let userMarker;
+
+let watchId = null;
+
+let tracking = false;
+let paused = false;
+
+let route = [];
+
+let totalDistance = 0;
+
+let startTime = 0;
+let pausedTime = 0;
+let pauseStarted = 0;
+
+let lastPosition = null;
+let timerInterval = null;
+
+
+/* =========================================
+   MAPA
+   ========================================= */
+
+map = L.map("map", {
+    zoomControl:false
+}).setView([19.4326,-99.1332], 15);
+
+L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+        maxZoom:19,
+        attribution:"© OpenStreetMap"
+    }
+).addTo(map);
+
+L.control.zoom({
+    position:"topright"
+}).addTo(map);
+
+routeLine = L.polyline([], {
+    color:"#35e58b",
+    weight:6,
+    opacity:.9
+}).addTo(map);
+
+
+/* =========================================
+   ELEMENTOS
+   ========================================= */
+
+const startBtn = document.getElementById("startBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+const stopBtn = document.getElementById("stopBtn");
+
+const distanceEl = document.getElementById("distance");
+const timeEl = document.getElementById("time");
+const speedEl = document.getElementById("speed");
+
+const statusDot = document.getElementById("statusDot");
+const statusText = document.getElementById("statusText");
+
+const message = document.getElementById("message");
+
+const locateBtn = document.getElementById("locateBtn");
+
+const summary = document.getElementById("summary");
+const closeSummary = document.getElementById("closeSummary");
+
+
+/* =========================================
+   DISTANCIA GPS
+   ========================================= */
+
+function calculateDistance(lat1, lon1, lat2, lon2){
+
+    const R = 6371000;
+
+    const p1 = lat1 * Math.PI / 180;
+    const p2 = lat2 * Math.PI / 180;
+
+    const dp = (lat2-lat1) * Math.PI / 180;
+    const dl = (lon2-lon1) * Math.PI / 180;
+
+    const a =
+        Math.sin(dp/2) * Math.sin(dp/2) +
+        Math.cos(p1) *
+        Math.cos(p2) *
+        Math.sin(dl/2) *
+        Math.sin(dl/2);
+
+    const c =
+        2 * Math.atan2(
+            Math.sqrt(a),
+            Math.sqrt(1-a)
+        );
+
+    return R*c;
+}
+
+
+/* =========================================
+   FORMATO TIEMPO
+   ========================================= */
+
+function formatTime(seconds){
+
+    seconds = Math.max(0, Math.floor(seconds));
+
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+
+    if(h > 0){
+
+        return String(h).padStart(2,"0") + ":" +
+               String(m).padStart(2,"0") + ":" +
+               String(s).padStart(2,"0");
+
+    }
+
+    return String(m).padStart(2,"0") + ":" +
+           String(s).padStart(2,"0");
+}
+
+
+/* =========================================
+   ACTUALIZAR TIEMPO
+   ========================================= */
+
+function updateTimer(){
+
+    if(!tracking || paused) return;
+
+    const elapsed =
+        (Date.now() - startTime - pausedTime) / 1000;
+
+    timeEl.textContent = formatTime(elapsed);
+
+    if(elapsed > 0){
+
+        const averageSpeed =
+            (totalDistance / 1000) / (elapsed / 3600);
+
+        speedEl.textContent =
+            averageSpeed.toFixed(1);
+    }
+}
+
+
+/* =========================================
+   GPS
+   ========================================= */
+
+function startGPS(){
+
+    if(!navigator.geolocation){
+
+        alert("Este dispositivo no permite utilizar GPS.");
+
+        return;
+    }
+
+    watchId = navigator.geolocation.watchPosition(
+        handlePosition,
+        handleGPSError,
+        {
+            enableHighAccuracy:true,
+            maximumAge:2000,
+            timeout:10000
+        }
+    );
+
+}
+
+
+/* =========================================
+   POSICIÓN
+   ========================================= */
+
+function handlePosition(position){
+
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+
+    const accuracy = position.coords.accuracy;
+
+    statusDot.classList.add("active");
+    statusText.textContent =
+        "GPS conectado";
+
+    if(!userMarker){
+
+        userMarker = L.circleMarker(
+            [lat,lon],
+            {
+                radius:8,
+                color:"#fff",
+                weight:3,
+                fillColor:"#35e58b",
+                fillOpacity:1
+            }
+        ).addTo(map);
+
+    }else{
+
+        userMarker.setLatLng([lat,lon]);
+
+    }
+
+    if(!tracking || paused){
+
+        return;
+    }
+
+    const point = {
+        lat,
+        lon,
+        accuracy,
+        timestamp:Date.now()
+    };
+
+    if(lastPosition){
+
+        const distance =
+            calculateDistance(
+                lastPosition.lat,
+                lastPosition.lon,
+                lat,
+                lon
+            );
+
+        /*
+         Evitamos sumar movimientos absurdos
+         provocados por errores del GPS.
+        */
+
+        if(
+            distance > 2 &&
+            distance < 100
+        ){
+
+            totalDistance += distance;
+
+        }
+
+    }
+
+    lastPosition = point;
+
+    route.push(point);
+
+    routeLine.setLatLngs(
+        route.map(p => [p.lat,p.lon])
+    );
+
+    distanceEl.textContent =
+        (totalDistance / 1000).toFixed(2);
+
+    map.panTo([lat,lon], {
+        animate:true,
+        duration:.4
+    });
+
+    message.textContent =
+        "Ruta registrada • precisión ±" +
+        Math.round(accuracy) +
+        " m";
+}
+
+
+/* =========================================
+   ERROR GPS
+   ========================================= */
+
+function handleGPSError(error){
+
+    statusDot.classList.remove("active");
+    statusText.textContent = "GPS sin señal";
+
+    if(error.code === 1){
+
+        message.textContent =
+            "Permite el acceso a tu ubicación para usar Fer Walk.";
+
+    }else{
+
+        message.textContent =
+            "No se pudo obtener la ubicación.";
+
+    }
+
+}
+
+
+/* =========================================
+   INICIAR
+   ========================================= */
+
+startBtn.addEventListener("click",()=>{
+
+    if(!navigator.geolocation){
+
+        alert("Tu navegador no admite geolocalización.");
+
+        return;
+    }
+
+    tracking = true;
+    paused = false;
+
+    route = [];
+    totalDistance = 0;
+
+    startTime = Date.now();
+    pausedTime = 0;
+
+    lastPosition = null;
+
+    routeLine.setLatLngs([]);
+
+    distanceEl.textContent = "0.00";
+    timeEl.textContent = "00:00";
+    speedEl.textContent = "0.0";
+
+    startBtn.style.display = "none";
+    pauseBtn.style.display = "block";
+    stopBtn.style.display = "block";
+
+    message.textContent =
+        "Buscando señal GPS...";
+
+    startGPS();
+
+    timerInterval = setInterval(
+        updateTimer,
+        1000
+    );
+
+});
+
+
+/* =========================================
+   PAUSAR
+   ========================================= */
+
+pauseBtn.addEventListener("click",()=>{
+
+    if(!tracking) return;
+
+    if(!paused){
+
+        paused = true;
+        pauseStarted = Date.now();
+
+        pauseBtn.textContent = "▶";
+
+        message.textContent =
+            "Caminata pausada.";
+
+    }else{
+
+        paused = false;
+
+        pausedTime +=
+            Date.now() - pauseStarted;
+
+        pauseBtn.textContent = "⏸";
+
+        message.textContent =
+            "Caminata reanudada.";
+
+    }
+
+});
+
+
+/* =========================================
+   TERMINAR
+   ========================================= */
+
+stopBtn.addEventListener("click",()=>{
+
+    if(!tracking) return;
+
+    tracking = false;
+
+    if(paused){
+
+        pausedTime +=
+            Date.now() - pauseStarted;
+
+        paused = false;
+    }
+
+    if(watchId !== null){
+
+        navigator.geolocation.clearWatch(
+            watchId
+        );
+
+        watchId = null;
+    }
+
+    clearInterval(timerInterval);
+
+    const elapsed =
+        (Date.now() - startTime - pausedTime) / 1000;
+
+    const averageSpeed =
+        elapsed > 0
+        ? (totalDistance/1000)/(elapsed/3600)
+        : 0;
+
+    document.getElementById("finalDistance")
+        .textContent =
+        (totalDistance/1000).toFixed(2) + " km";
+
+    document.getElementById("finalTime")
+        .textContent =
+        formatTime(elapsed);
+
+    document.getElementById("finalSpeed")
+        .textContent =
+        averageSpeed.toFixed(1) + " km/h";
+
+    document.getElementById("finalPoints")
+        .textContent =
+        route.length;
+
+    summary.style.display = "flex";
+
+    startBtn.style.display = "block";
+    pauseBtn.style.display = "none";
+    stopBtn.style.display = "none";
+
+    pauseBtn.textContent = "⏸";
+
+    message.textContent =
+        "Caminata terminada.";
+
+});
+
+
+/* =========================================
+   CERRAR RESUMEN
+   ========================================= */
+
+closeSummary.addEventListener("click",()=>{
+
+    summary.style.display = "none";
+
+});
+
+
+/* =========================================
+   UBICACIÓN ACTUAL
+   ========================================= */
+
+locateBtn.addEventListener("click",()=>{
+
+    if(userMarker){
+
+        map.setView(
+            userMarker.getLatLng(),
+            17,
+            {
+                animate:true
+            }
+        );
+
+        return;
+    }
+
+    if(!navigator.geolocation){
+
+        alert("GPS no disponible.");
+
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+
+        position => {
+
+            const lat =
+                position.coords.latitude;
+
+            const lon =
+                position.coords.longitude;
+
+            map.setView(
+                [lat,lon],
+                17
+            );
+
+        },
+
+        () => {
+
+            alert(
+                "No se pudo obtener tu ubicación."
+            );
+
+        },
+
+        {
+            enableHighAccuracy:true,
+            timeout:10000
+        }
+
+    );
+
+});
+
+
+/* =========================================
+   AJUSTE INICIAL DE PANTALLA
+   ========================================= */
+
+window.addEventListener("resize",()=>{
+
+    map.invalidateSize();
+
+});
+
+</script>
+
+</body>
+</html>
