@@ -244,6 +244,142 @@ button:disabled{
     background:#1c2536;
 }
 
+.mapTypeBtn{
+    bottom:465px;
+    color:#666;
+}
+
+.mapTypeBtn.on{
+    color:#f0b429;
+    background:#2b2416;
+}
+
+.tilt3dBtn{
+    bottom:525px;
+    color:#666;
+    font-size:13px;
+    font-weight:900;
+}
+
+.tilt3dBtn.on{
+    color:#e97ce9;
+    background:#2b1c2e;
+}
+
+#map.tilted{
+    transform:perspective(900px) rotateX(45deg) scale(1.35);
+    transform-origin:50% 100%;
+    transition:transform .35s ease;
+}
+
+.map-type-panel{
+    position:absolute;
+    top:82px;
+    left:15px;
+    right:15px;
+    z-index:1000;
+    background:rgba(23,28,36,.96);
+    border-radius:18px;
+    padding:14px;
+    display:none;
+    box-shadow:0 6px 20px rgba(0,0,0,.35);
+}
+
+.map-type-panel small{
+    display:block;
+    color:#888;
+    font-size:10px;
+    letter-spacing:.5px;
+    margin-bottom:10px;
+}
+
+.map-type-options{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+}
+
+.map-type-options button{
+    background:#2a323e;
+    color:#ccc;
+    border-radius:12px;
+    padding:12px 4px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.map-type-options button.selected{
+    background:#f0b429;
+    color:#17120a;
+}
+
+.status-banner{
+    text-align:center;
+    padding:8px 12px;
+    border-radius:12px;
+    font-size:12px;
+    font-weight:700;
+    background:#1c232d;
+    color:#aaa;
+    margin-bottom:12px;
+    transition:background .3s, color .3s;
+}
+
+.status-banner.ok{
+    background:#173224;
+    color:#35e58b;
+}
+
+.status-banner.warn{
+    background:#332a12;
+    color:#f0b429;
+}
+
+.status-banner.err{
+    background:#331717;
+    color:#e74c3c;
+}
+
+.big-controls{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:22px;
+    margin-top:6px;
+}
+
+.circleBtn{
+    width:64px;
+    height:64px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+    padding:0;
+}
+
+#startBtn.circleBtn{
+    width:82px;
+    height:82px;
+    font-size:28px;
+    background:#ff5a1f;
+    color:white;
+    box-shadow:0 6px 22px rgba(255,90,31,.45);
+}
+
+#pauseBtn.circleBtn{
+    background:#2a323e;
+    color:#f0b429;
+    font-size:22px;
+}
+
+#stopBtn.circleBtn{
+    background:#2a323e;
+    color:#e74c3c;
+    font-size:20px;
+}
+
 .plan-panel{
     position:absolute;
     top:82px;
@@ -382,6 +518,14 @@ button:disabled{
     .planToggle{
         bottom:380px;
     }
+
+    .mapTypeBtn{
+        bottom:440px;
+    }
+
+    .tilt3dBtn{
+        bottom:500px;
+    }
 }
 </style>
 </head>
@@ -411,8 +555,19 @@ button:disabled{
     </div>
 </div>
 
+<div class="map-type-panel" id="mapTypePanel">
+    <small>TIPO DE MAPA</small>
+    <div class="map-type-options">
+        <button id="mapTypeStandard" class="selected">Estándar</button>
+        <button id="mapTypeSatellite">Satélite</button>
+        <button id="mapTypeHybrid">Híbrido</button>
+    </div>
+</div>
+
 <div class="plan-hint" id="planHint">Toca el mapa para añadir puntos de tu ruta</div>
 
+<button class="fab tilt3dBtn" id="tilt3dBtn" aria-label="Vista 3D del terreno" title="Vista 3D" disabled>3D</button>
+<button class="fab mapTypeBtn" id="mapTypeBtn" aria-label="Cambiar tipo de mapa" title="Tipo de mapa" disabled>▦</button>
 <button class="fab planToggle" id="planBtn" aria-label="Personalizar ruta" title="Personalizar ruta" disabled>✎</button>
 <button class="fab follow on" id="followBtn" aria-label="Activar/desactivar seguimiento del mapa" title="Seguir mi ubicación" disabled>⦿</button>
 <button class="fab locate" id="locateBtn" aria-label="Centrar mapa en mi ubicación" title="Ir a mi ubicación" disabled>⌖</button>
@@ -420,6 +575,10 @@ button:disabled{
 <section class="panel">
 
     <div class="handle"></div>
+
+    <div class="status-banner" id="statusBanner">
+        Cargando mapa...
+    </div>
 
     <div class="stats">
 
@@ -448,24 +607,24 @@ button:disabled{
 
     </div>
 
-    <div class="controls">
+    <div class="big-controls">
 
-        <button id="startBtn" aria-label="Iniciar caminata" disabled>
-            ▶ Iniciar caminata
-        </button>
-
-        <button id="pauseBtn" aria-label="Pausar caminata">
+        <button id="pauseBtn" class="circleBtn" aria-label="Pausar caminata">
             ⏸
         </button>
 
-        <button id="stopBtn" aria-label="Terminar caminata">
+        <button id="startBtn" class="circleBtn" aria-label="Iniciar caminata" disabled>
+            ▶
+        </button>
+
+        <button id="stopBtn" class="circleBtn" aria-label="Terminar caminata">
             ■
         </button>
 
     </div>
 
     <div class="message" id="message">
-        Cargando mapa...
+        Pulsa el botón para comenzar
     </div>
 
 </section>
@@ -582,6 +741,11 @@ let planMarkers = [];
 let planLine = null;
 let hasPlan = false;
 
+/* Tipo de mapa y vista 3D */
+let baseLayers = {};
+let currentMapType = "standard";
+let tilted = false;
+
 /* Precisión mínima aceptable (metros). Lecturas peores se ignoran
    para el cálculo de distancia, aunque el marcador sí se actualiza. */
 const MAX_ACCEPTABLE_ACCURACY = 30;
@@ -604,10 +768,28 @@ const statusDot = document.getElementById("statusDot");
 const statusText = document.getElementById("statusText");
 
 const message = document.getElementById("message");
+const statusBanner = document.getElementById("statusBanner");
+
+function setStatusBanner(text, level){
+
+    statusBanner.textContent = text;
+    statusBanner.classList.remove("ok","warn","err");
+
+    if(level) statusBanner.classList.add(level);
+
+}
 
 const locateBtn = document.getElementById("locateBtn");
 const followBtn = document.getElementById("followBtn");
 const planBtn = document.getElementById("planBtn");
+
+const mapTypeBtn = document.getElementById("mapTypeBtn");
+const mapTypePanel = document.getElementById("mapTypePanel");
+const mapTypeStandard = document.getElementById("mapTypeStandard");
+const mapTypeSatellite = document.getElementById("mapTypeSatellite");
+const mapTypeHybrid = document.getElementById("mapTypeHybrid");
+
+const tilt3dBtn = document.getElementById("tilt3dBtn");
 
 const planPanel = document.getElementById("planPanel");
 const planHint = document.getElementById("planHint");
@@ -973,6 +1155,17 @@ planBtn.addEventListener("click", () => {
 
     }
 
+    if(tilted){
+
+        alert("Desactiva la vista 3D antes de personalizar una ruta.");
+
+        return;
+
+    }
+
+    mapTypePanel.style.display = "none";
+    mapTypeBtn.classList.remove("on");
+
     setPlanningMode(!planningMode);
 
 });
@@ -1050,6 +1243,122 @@ followBtn.addEventListener("click", () => {
 
 
 /* =========================================
+   TIPO DE MAPA
+   ========================================= */
+
+function setMapType(type){
+
+    if(!mapReady || type === currentMapType) {
+
+        mapTypePanel.style.display = "none";
+        return;
+
+    }
+
+    /* Quitamos todas las capas base actuales */
+    Object.values(baseLayers).forEach(layer => {
+
+        if(map.hasLayer(layer)) map.removeLayer(layer);
+
+    });
+
+    if(type === "standard"){
+
+        baseLayers.standard.addTo(map);
+
+    }else if(type === "satellite"){
+
+        baseLayers.satellite.addTo(map);
+
+    }else if(type === "hybrid"){
+
+        baseLayers.satellite.addTo(map);
+        baseLayers.hybridLabels.addTo(map);
+
+    }
+
+    currentMapType = type;
+
+    [mapTypeStandard, mapTypeSatellite, mapTypeHybrid].forEach(
+        b => b.classList.remove("selected")
+    );
+
+    const selectedBtn =
+        type === "standard" ? mapTypeStandard :
+        type === "satellite" ? mapTypeSatellite :
+        mapTypeHybrid;
+
+    selectedBtn.classList.add("selected");
+
+    mapTypePanel.style.display = "none";
+
+}
+
+mapTypeBtn.addEventListener("click", () => {
+
+    if(!mapReady) return;
+
+    if(planningMode) setPlanningMode(false);
+
+    const isOpen = mapTypePanel.style.display === "block";
+
+    mapTypePanel.style.display = isOpen ? "none" : "block";
+    mapTypeBtn.classList.toggle("on", !isOpen);
+
+});
+
+mapTypeStandard.addEventListener("click", () => setMapType("standard"));
+mapTypeSatellite.addEventListener("click", () => setMapType("satellite"));
+mapTypeHybrid.addEventListener("click", () => setMapType("hybrid"));
+
+
+/* =========================================
+   VISTA 3D (inclinación visual del mapa)
+
+   Nota: es un efecto CSS de perspectiva, no un modelo de
+   elevación real. Mientras está activo se desactiva el arrastre
+   del mapa y el modo "Personalizar ruta", porque las coordenadas
+   de los toques ya no coinciden con la proyección inclinada.
+   ========================================= */
+
+function setTilt(on){
+
+    if(!mapReady) return;
+
+    tilted = on;
+
+    document.getElementById("map").classList.toggle("tilted", tilted);
+    tilt3dBtn.classList.toggle("on", tilted);
+
+    if(tilted){
+
+        if(planningMode) setPlanningMode(false);
+
+        planBtn.disabled = true;
+        map.dragging.disable();
+
+        message.textContent =
+            "Vista 3D activa (visual). Desactívala para arrastrar el mapa.";
+
+    }else{
+
+        planBtn.disabled = false;
+        map.dragging.enable();
+
+    }
+
+    setTimeout(() => map.invalidateSize(), 400);
+
+}
+
+tilt3dBtn.addEventListener("click", () => {
+
+    setTilt(!tilted);
+
+});
+
+
+/* =========================================
    POSICIÓN
    ========================================= */
 
@@ -1068,10 +1377,14 @@ function handlePosition(position){
             ? "GPS conectado"
             : "GPS débil (±" + Math.round(accuracy) + " m)";
 
+    setStatusBanner(statusText.textContent, "ok");
+
     if(accuracy > MAX_ACCEPTABLE_ACCURACY){
 
         statusDot.classList.remove("active");
         statusDot.classList.add("warn");
+
+        setStatusBanner(statusText.textContent, "warn");
 
     }
 
@@ -1201,6 +1514,7 @@ function handleGPSError(error){
     statusDot.classList.remove("active","warn");
     statusDot.classList.add("error");
     statusText.textContent = "GPS sin señal";
+    setStatusBanner("GPS sin señal", "err");
 
     if(error.code === error.PERMISSION_DENIED){
 
@@ -1280,8 +1594,8 @@ startBtn.addEventListener("click", async ()=>{
     paceEl.textContent = "--:--";
 
     startBtn.style.display = "none";
-    pauseBtn.style.display = "block";
-    stopBtn.style.display = "block";
+    pauseBtn.style.display = "flex";
+    stopBtn.style.display = "flex";
 
     setFollowMode(true);
 
@@ -1406,7 +1720,7 @@ stopBtn.addEventListener("click",()=>{
 
     summary.style.display = "flex";
 
-    startBtn.style.display = "block";
+    startBtn.style.display = "flex";
     pauseBtn.style.display = "none";
     stopBtn.style.display = "none";
 
@@ -1568,6 +1882,7 @@ async function initApp(){
 
         statusDot.classList.add("error");
         statusText.textContent = "Sin conexión al mapa";
+        setStatusBanner("Sin conexión al mapa", "err");
         message.textContent =
             "No se pudo cargar el mapa. Recarga la página.";
 
@@ -1579,13 +1894,34 @@ async function initApp(){
         zoomControl:false
     }).setView([19.4326,-99.1332], 15);
 
-    L.tileLayer(
+    /* Capas base. Satélite/Híbrido usan Esri World Imagery, que no
+       requiere API key. El híbrido añade una capa de referencia
+       (calles y nombres) encima de la imagen satelital. */
+    baseLayers.standard = L.tileLayer(
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         {
             maxZoom:19,
             attribution:"© OpenStreetMap"
         }
-    ).addTo(map);
+    );
+
+    baseLayers.satellite = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+            maxZoom:19,
+            attribution:"© Esri"
+        }
+    );
+
+    baseLayers.hybridLabels = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+        {
+            maxZoom:19,
+            attribution:"© Esri"
+        }
+    );
+
+    baseLayers.standard.addTo(map);
 
     L.control.zoom({
         position:"topright"
@@ -1621,11 +1957,14 @@ async function initApp(){
     locateBtn.disabled = false;
     followBtn.disabled = false;
     planBtn.disabled = false;
+    mapTypeBtn.disabled = false;
+    tilt3dBtn.disabled = false;
 
     statusDot.classList.remove("error");
     statusText.textContent = "GPS inactivo";
+    setStatusBanner("Listo para caminar");
     message.textContent =
-        'Pulsa "Iniciar caminata" para comenzar.';
+        'Pulsa el botón para comenzar';
 
     if(navigator.geolocation && window.isSecureContext){
 
