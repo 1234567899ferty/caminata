@@ -18,21 +18,29 @@
     -webkit-tap-highlight-color:transparent;
 }
 
+html,body{
+    height:100%;
+}
+
 body{
     margin:0;
     font-family:Arial,Helvetica,sans-serif;
     background:#10131a;
     color:white;
     overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    height:100vh;
+    height:100dvh;
 }
 
 header{
-    height:70px;
+    flex:0 0 auto;
     background:linear-gradient(135deg,#10131a,#1b222d);
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:0 18px;
+    padding:12px 18px;
     position:relative;
     z-index:1000;
     box-shadow:0 3px 15px rgba(0,0,0,.35);
@@ -79,15 +87,25 @@ header{
 }
 
 :root{
-    --tabbar-height:64px;
+    --tabbar-height:56px;
+}
+
+.view-stack{
+    position:relative;
+    flex:1 1 auto;
+    min-height:0;
+    overflow:hidden;
+}
+
+.map-wrap{
+    position:relative;
+    flex:1 1 auto;
+    min-height:110px;
 }
 
 #map{
     position:absolute;
-    top:70px;
-    bottom:calc(265px + var(--tabbar-height));
-    left:0;
-    right:0;
+    inset:0;
     z-index:1;
 }
 
@@ -104,14 +122,11 @@ header{
 }
 
 .panel{
-    position:absolute;
-    bottom:var(--tabbar-height);
-    left:0;
-    right:0;
-    height:265px;
+    position:relative;
+    flex:0 0 auto;
     background:rgba(16,19,26,.97);
     border-radius:25px 25px 0 0;
-    padding:18px;
+    padding:14px 18px;
     z-index:1000;
     box-shadow:0 -8px 30px rgba(0,0,0,.35);
 }
@@ -225,12 +240,12 @@ button:disabled{
 }
 
 .locate{
-    bottom:calc(285px + var(--tabbar-height));
+    bottom:15px;
     font-size:22px;
 }
 
 .follow{
-    bottom:calc(345px + var(--tabbar-height));
+    bottom:75px;
     color:#666;
 }
 
@@ -239,7 +254,7 @@ button:disabled{
 }
 
 .planToggle{
-    bottom:calc(405px + var(--tabbar-height));
+    bottom:135px;
     color:#666;
 }
 
@@ -249,7 +264,7 @@ button:disabled{
 }
 
 .mapTypeBtn{
-    bottom:calc(465px + var(--tabbar-height));
+    bottom:195px;
     color:#666;
 }
 
@@ -259,7 +274,7 @@ button:disabled{
 }
 
 .tilt3dBtn{
-    bottom:calc(525px + var(--tabbar-height));
+    bottom:255px;
     color:#666;
     font-size:13px;
     font-weight:900;
@@ -278,7 +293,7 @@ button:disabled{
 
 .map-type-panel{
     position:absolute;
-    top:82px;
+    top:12px;
     left:15px;
     right:15px;
     z-index:1000;
@@ -386,7 +401,7 @@ button:disabled{
 
 .plan-panel{
     position:absolute;
-    top:82px;
+    top:12px;
     left:15px;
     right:15px;
     z-index:1000;
@@ -438,7 +453,7 @@ button:disabled{
 
 .plan-hint{
     position:absolute;
-    top:82px;
+    top:12px;
     left:15px;
     right:15px;
     z-index:999;
@@ -581,36 +596,6 @@ button:disabled{
     color:white;
 }
 
-@media(max-height:650px){
-    #map{
-        bottom:calc(240px + var(--tabbar-height));
-    }
-
-    .panel{
-        height:240px;
-    }
-
-    .locate{
-        bottom:calc(260px + var(--tabbar-height));
-    }
-
-    .follow{
-        bottom:calc(320px + var(--tabbar-height));
-    }
-
-    .planToggle{
-        bottom:calc(380px + var(--tabbar-height));
-    }
-
-    .mapTypeBtn{
-        bottom:calc(440px + var(--tabbar-height));
-    }
-
-    .tilt3dBtn{
-        bottom:calc(500px + var(--tabbar-height));
-    }
-}
-
 /* =========================================
    VISTAS Y BARRA DE NAVEGACIÓN INFERIOR
    ========================================= */
@@ -618,10 +603,7 @@ button:disabled{
 .view{
     display:none;
     position:absolute;
-    top:70px;
-    bottom:var(--tabbar-height);
-    left:0;
-    right:0;
+    inset:0;
     overflow-y:auto;
 }
 
@@ -629,11 +611,9 @@ button:disabled{
     display:block;
 }
 
-#view-registrar{
-    /* Este contenedor mantiene sus propios hijos con position:
-       absolute referidos al body (mapa, fabs, panel), así que
-       no necesita scroll ni recortar contenido. */
-    overflow:visible;
+#view-registrar.active{
+    display:flex;
+    flex-direction:column;
 }
 
 .simple-view{
@@ -749,10 +729,7 @@ button:disabled{
 }
 
 .tabbar{
-    position:absolute;
-    bottom:0;
-    left:0;
-    right:0;
+    flex:0 0 auto;
     height:var(--tabbar-height);
     background:#0c0f14;
     border-top:1px solid #1c232d;
@@ -815,6 +792,8 @@ button:disabled{
     </div>
 </header>
 
+<div class="view-stack">
+
 <div class="view" id="view-inicio">
     <div class="simple-view">
         <h2>Tus caminatas</h2>
@@ -832,36 +811,40 @@ button:disabled{
 
 <div class="view active" id="view-registrar">
 
-    <div id="map"></div>
+    <div class="map-wrap">
 
-    <div class="plan-panel" id="planPanel">
-        <div class="plan-info">
-            <small>RUTA PERSONALIZADA</small>
-            <strong><span id="planDistance">0.00</span> km</strong>
+        <div id="map"></div>
+
+        <div class="plan-panel" id="planPanel">
+            <div class="plan-info">
+                <small>RUTA PERSONALIZADA</small>
+                <strong><span id="planDistance">0.00</span> km</strong>
+            </div>
+            <div class="plan-actions">
+                <button id="undoPlanBtn" title="Deshacer último punto" aria-label="Deshacer último punto">↩</button>
+                <button id="clearPlanBtn" title="Borrar ruta" aria-label="Borrar ruta">✕</button>
+                <button id="donePlanBtn" title="Guardar y salir" aria-label="Guardar ruta y salir">✓</button>
+            </div>
         </div>
-        <div class="plan-actions">
-            <button id="undoPlanBtn" title="Deshacer último punto" aria-label="Deshacer último punto">↩</button>
-            <button id="clearPlanBtn" title="Borrar ruta" aria-label="Borrar ruta">✕</button>
-            <button id="donePlanBtn" title="Guardar y salir" aria-label="Guardar ruta y salir">✓</button>
+
+        <div class="map-type-panel" id="mapTypePanel">
+            <small>TIPO DE MAPA</small>
+            <div class="map-type-options">
+                <button id="mapTypeStandard" class="selected">Estándar</button>
+                <button id="mapTypeSatellite">Satélite</button>
+                <button id="mapTypeHybrid">Híbrido</button>
+            </div>
         </div>
+
+        <div class="plan-hint" id="planHint">Toca el mapa para añadir puntos de tu ruta</div>
+
+        <button class="fab tilt3dBtn" id="tilt3dBtn" aria-label="Vista 3D del terreno" title="Vista 3D" disabled>3D</button>
+        <button class="fab mapTypeBtn" id="mapTypeBtn" aria-label="Cambiar tipo de mapa" title="Tipo de mapa" disabled>▦</button>
+        <button class="fab planToggle" id="planBtn" aria-label="Personalizar ruta" title="Personalizar ruta" disabled>✎</button>
+        <button class="fab follow on" id="followBtn" aria-label="Activar/desactivar seguimiento del mapa" title="Seguir mi ubicación" disabled>⦿</button>
+        <button class="fab locate" id="locateBtn" aria-label="Centrar mapa en mi ubicación" title="Ir a mi ubicación" disabled>⌖</button>
+
     </div>
-
-    <div class="map-type-panel" id="mapTypePanel">
-        <small>TIPO DE MAPA</small>
-        <div class="map-type-options">
-            <button id="mapTypeStandard" class="selected">Estándar</button>
-            <button id="mapTypeSatellite">Satélite</button>
-            <button id="mapTypeHybrid">Híbrido</button>
-        </div>
-    </div>
-
-    <div class="plan-hint" id="planHint">Toca el mapa para añadir puntos de tu ruta</div>
-
-    <button class="fab tilt3dBtn" id="tilt3dBtn" aria-label="Vista 3D del terreno" title="Vista 3D" disabled>3D</button>
-    <button class="fab mapTypeBtn" id="mapTypeBtn" aria-label="Cambiar tipo de mapa" title="Tipo de mapa" disabled>▦</button>
-    <button class="fab planToggle" id="planBtn" aria-label="Personalizar ruta" title="Personalizar ruta" disabled>✎</button>
-    <button class="fab follow on" id="followBtn" aria-label="Activar/desactivar seguimiento del mapa" title="Seguir mi ubicación" disabled>⦿</button>
-    <button class="fab locate" id="locateBtn" aria-label="Centrar mapa en mi ubicación" title="Ir a mi ubicación" disabled>⌖</button>
 
     <section class="panel">
 
