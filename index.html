@@ -78,10 +78,14 @@ header{
     box-shadow:0 0 10px #e74c3c;
 }
 
+:root{
+    --tabbar-height:64px;
+}
+
 #map{
     position:absolute;
     top:70px;
-    bottom:265px;
+    bottom:calc(265px + var(--tabbar-height));
     left:0;
     right:0;
     z-index:1;
@@ -101,7 +105,7 @@ header{
 
 .panel{
     position:absolute;
-    bottom:0;
+    bottom:var(--tabbar-height);
     left:0;
     right:0;
     height:265px;
@@ -221,12 +225,12 @@ button:disabled{
 }
 
 .locate{
-    bottom:285px;
+    bottom:calc(285px + var(--tabbar-height));
     font-size:22px;
 }
 
 .follow{
-    bottom:345px;
+    bottom:calc(345px + var(--tabbar-height));
     color:#666;
 }
 
@@ -235,7 +239,7 @@ button:disabled{
 }
 
 .planToggle{
-    bottom:405px;
+    bottom:calc(405px + var(--tabbar-height));
     color:#666;
 }
 
@@ -245,7 +249,7 @@ button:disabled{
 }
 
 .mapTypeBtn{
-    bottom:465px;
+    bottom:calc(465px + var(--tabbar-height));
     color:#666;
 }
 
@@ -255,7 +259,7 @@ button:disabled{
 }
 
 .tilt3dBtn{
-    bottom:525px;
+    bottom:calc(525px + var(--tabbar-height));
     color:#666;
     font-size:13px;
     font-weight:900;
@@ -498,9 +502,88 @@ button:disabled{
     background:#35e58b;
 }
 
+.warmup-card{
+    width:100%;
+    max-width:430px;
+    background:#171c24;
+    border-radius:25px;
+    padding:25px;
+    text-align:center;
+    box-shadow:0 15px 50px rgba(0,0,0,.5);
+}
+
+.warmup-card h2{
+    margin-top:0;
+    color:#f0b429;
+}
+
+.warmup-card p{
+    color:#999;
+    font-size:13px;
+    line-height:1.5;
+}
+
+.warmup-step{
+    background:#222934;
+    border-radius:18px;
+    padding:22px 15px;
+    margin:18px 0;
+}
+
+.warmup-step .step-name{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+.warmup-step .step-count{
+    font-size:34px;
+    font-weight:900;
+    color:#f0b429;
+}
+
+.warmup-progress{
+    height:6px;
+    background:#2a323e;
+    border-radius:6px;
+    overflow:hidden;
+    margin-top:14px;
+}
+
+.warmup-progress-bar{
+    height:100%;
+    background:#f0b429;
+    width:0%;
+    transition:width 1s linear;
+}
+
+.warmup-actions{
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+}
+
+.warmup-actions button{
+    flex:1;
+}
+
+#skipWarmup{
+    background:#2a323e;
+    color:#ccc;
+}
+
+#startWarmup{
+    background:#35e58b;
+}
+
+#skipToWalk{
+    background:#e74c3c;
+    color:white;
+}
+
 @media(max-height:650px){
     #map{
-        bottom:240px;
+        bottom:calc(240px + var(--tabbar-height));
     }
 
     .panel{
@@ -508,24 +591,215 @@ button:disabled{
     }
 
     .locate{
-        bottom:260px;
+        bottom:calc(260px + var(--tabbar-height));
     }
 
     .follow{
-        bottom:320px;
+        bottom:calc(320px + var(--tabbar-height));
     }
 
     .planToggle{
-        bottom:380px;
+        bottom:calc(380px + var(--tabbar-height));
     }
 
     .mapTypeBtn{
-        bottom:440px;
+        bottom:calc(440px + var(--tabbar-height));
     }
 
     .tilt3dBtn{
-        bottom:500px;
+        bottom:calc(500px + var(--tabbar-height));
     }
+}
+
+/* =========================================
+   VISTAS Y BARRA DE NAVEGACIÓN INFERIOR
+   ========================================= */
+
+.view{
+    display:none;
+    position:absolute;
+    top:70px;
+    bottom:var(--tabbar-height);
+    left:0;
+    right:0;
+    overflow-y:auto;
+}
+
+.view.active{
+    display:block;
+}
+
+#view-registrar{
+    /* Este contenedor mantiene sus propios hijos con position:
+       absolute referidos al body (mapa, fabs, panel), así que
+       no necesita scroll ni recortar contenido. */
+    overflow:visible;
+}
+
+.simple-view{
+    padding:24px 20px 30px;
+}
+
+.simple-view h2{
+    margin:10px 0 4px;
+    font-size:20px;
+}
+
+.simple-view p{
+    color:#999;
+    font-size:14px;
+    line-height:1.5;
+}
+
+.simple-view .soon-badge{
+    display:inline-block;
+    background:#1c232d;
+    color:#f0b429;
+    font-size:11px;
+    font-weight:700;
+    padding:4px 10px;
+    border-radius:10px;
+    margin-bottom:14px;
+}
+
+.profile-card{
+    background:#1c232d;
+    border-radius:18px;
+    padding:18px;
+    margin-top:14px;
+}
+
+.profile-card .name-row{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    margin-bottom:14px;
+}
+
+.profile-card input{
+    flex:1;
+    background:#10131a;
+    border:1px solid #2a323e;
+    border-radius:10px;
+    padding:10px 12px;
+    color:white;
+    font-size:15px;
+}
+
+.profile-stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+}
+
+.profile-stats .stat{
+    background:#10131a;
+}
+
+.session-note{
+    color:#666;
+    font-size:11px;
+    margin-top:14px;
+}
+
+.danger-link{
+    display:block;
+    width:100%;
+    background:none;
+    color:#e74c3c;
+    font-size:12px;
+    font-weight:600;
+    padding:10px;
+    margin-top:10px;
+    text-align:center;
+}
+
+.history-item{
+    background:#1c232d;
+    border-radius:16px;
+    padding:14px 16px;
+    margin-bottom:10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.history-item .history-date{
+    font-size:11px;
+    color:#888;
+    margin-bottom:4px;
+}
+
+.history-item .history-main{
+    font-size:16px;
+    font-weight:700;
+}
+
+.history-item .history-sub{
+    font-size:11px;
+    color:#999;
+    margin-top:2px;
+}
+
+.history-empty{
+    color:#666;
+    font-size:13px;
+    text-align:center;
+    padding:30px 10px;
+}
+
+.tabbar{
+    position:absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    height:var(--tabbar-height);
+    background:#0c0f14;
+    border-top:1px solid #1c232d;
+    display:flex;
+    align-items:center;
+    justify-content:space-around;
+    z-index:2000;
+    padding-bottom:env(safe-area-inset-bottom, 0);
+}
+
+.tab-item{
+    background:none;
+    border:0;
+    padding:6px 4px 4px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    color:#777;
+    font-size:10px;
+    font-weight:600;
+    border-radius:0;
+}
+
+.tab-item .tab-icon{
+    font-size:19px;
+}
+
+.tab-item.active{
+    color:#35e58b;
+}
+
+.tab-item.record .tab-icon{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:#35e58b;
+    color:#07150e;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+}
+
+.tab-item.record.active .tab-icon{
+    background:#ff5a1f;
+    color:white;
 }
 </style>
 </head>
@@ -533,7 +807,7 @@ button:disabled{
 <body>
 
 <header>
-    <div class="logo">🚶 <span>Fer</span> Walk</div>
+    <div class="logo"><span>Fer</span> Walk</div>
 
     <div class="status">
         <div id="statusDot" class="dot"></div>
@@ -541,99 +815,160 @@ button:disabled{
     </div>
 </header>
 
-<div id="map"></div>
-
-<div class="plan-panel" id="planPanel">
-    <div class="plan-info">
-        <small>RUTA PERSONALIZADA</small>
-        <strong><span id="planDistance">0.00</span> km</strong>
-    </div>
-    <div class="plan-actions">
-        <button id="undoPlanBtn" title="Deshacer último punto" aria-label="Deshacer último punto">↩</button>
-        <button id="clearPlanBtn" title="Borrar ruta" aria-label="Borrar ruta">🗑</button>
-        <button id="donePlanBtn" title="Guardar y salir" aria-label="Guardar ruta y salir">✓</button>
+<div class="view" id="view-inicio">
+    <div class="simple-view">
+        <h2>Tus caminatas</h2>
+        <div id="historyList"></div>
     </div>
 </div>
 
-<div class="map-type-panel" id="mapTypePanel">
-    <small>TIPO DE MAPA</small>
-    <div class="map-type-options">
-        <button id="mapTypeStandard" class="selected">Estándar</button>
-        <button id="mapTypeSatellite">Satélite</button>
-        <button id="mapTypeHybrid">Híbrido</button>
+<div class="view" id="view-mapas">
+    <div class="simple-view">
+        <span class="soon-badge">PRÓXIMAMENTE</span>
+        <h2>Mapas</h2>
+        <p>Aquí podrás explorar y guardar rutas para caminar, además de tus rutas personalizadas. Por ahora, crea una ruta personalizada desde la pestaña "Registrar" tocando el botón ✎ sobre el mapa.</p>
     </div>
 </div>
 
-<div class="plan-hint" id="planHint">Toca el mapa para añadir puntos de tu ruta</div>
+<div class="view active" id="view-registrar">
 
-<button class="fab tilt3dBtn" id="tilt3dBtn" aria-label="Vista 3D del terreno" title="Vista 3D" disabled>3D</button>
-<button class="fab mapTypeBtn" id="mapTypeBtn" aria-label="Cambiar tipo de mapa" title="Tipo de mapa" disabled>▦</button>
-<button class="fab planToggle" id="planBtn" aria-label="Personalizar ruta" title="Personalizar ruta" disabled>✎</button>
-<button class="fab follow on" id="followBtn" aria-label="Activar/desactivar seguimiento del mapa" title="Seguir mi ubicación" disabled>⦿</button>
-<button class="fab locate" id="locateBtn" aria-label="Centrar mapa en mi ubicación" title="Ir a mi ubicación" disabled>⌖</button>
+    <div id="map"></div>
 
-<section class="panel">
-
-    <div class="handle"></div>
-
-    <div class="status-banner" id="statusBanner">
-        Cargando mapa...
+    <div class="plan-panel" id="planPanel">
+        <div class="plan-info">
+            <small>RUTA PERSONALIZADA</small>
+            <strong><span id="planDistance">0.00</span> km</strong>
+        </div>
+        <div class="plan-actions">
+            <button id="undoPlanBtn" title="Deshacer último punto" aria-label="Deshacer último punto">↩</button>
+            <button id="clearPlanBtn" title="Borrar ruta" aria-label="Borrar ruta">✕</button>
+            <button id="donePlanBtn" title="Guardar y salir" aria-label="Guardar ruta y salir">✓</button>
+        </div>
     </div>
 
-    <div class="stats">
-
-        <div class="stat">
-            <small>DISTANCIA</small>
-            <strong id="distance">0.00</strong>
-            <span class="unit">km</span>
+    <div class="map-type-panel" id="mapTypePanel">
+        <small>TIPO DE MAPA</small>
+        <div class="map-type-options">
+            <button id="mapTypeStandard" class="selected">Estándar</button>
+            <button id="mapTypeSatellite">Satélite</button>
+            <button id="mapTypeHybrid">Híbrido</button>
         </div>
-
-        <div class="stat">
-            <small>TIEMPO</small>
-            <strong id="time">00:00</strong>
-        </div>
-
-        <div class="stat">
-            <small>VELOCIDAD</small>
-            <strong id="speed">0.0</strong>
-            <span class="unit">km/h</span>
-        </div>
-
-        <div class="stat">
-            <small>RITMO</small>
-            <strong id="pace">--:--</strong>
-            <span class="unit">min/km</span>
-        </div>
-
     </div>
 
-    <div class="big-controls">
+    <div class="plan-hint" id="planHint">Toca el mapa para añadir puntos de tu ruta</div>
 
-        <button id="pauseBtn" class="circleBtn" aria-label="Pausar caminata">
-            ⏸
-        </button>
+    <button class="fab tilt3dBtn" id="tilt3dBtn" aria-label="Vista 3D del terreno" title="Vista 3D" disabled>3D</button>
+    <button class="fab mapTypeBtn" id="mapTypeBtn" aria-label="Cambiar tipo de mapa" title="Tipo de mapa" disabled>▦</button>
+    <button class="fab planToggle" id="planBtn" aria-label="Personalizar ruta" title="Personalizar ruta" disabled>✎</button>
+    <button class="fab follow on" id="followBtn" aria-label="Activar/desactivar seguimiento del mapa" title="Seguir mi ubicación" disabled>⦿</button>
+    <button class="fab locate" id="locateBtn" aria-label="Centrar mapa en mi ubicación" title="Ir a mi ubicación" disabled>⌖</button>
 
-        <button id="startBtn" class="circleBtn" aria-label="Iniciar caminata" disabled>
-            ▶
-        </button>
+    <section class="panel">
 
-        <button id="stopBtn" class="circleBtn" aria-label="Terminar caminata">
-            ■
-        </button>
+        <div class="handle"></div>
+
+        <div class="status-banner" id="statusBanner">
+            Cargando mapa...
+        </div>
+
+        <div class="stats">
+
+            <div class="stat">
+                <small>DISTANCIA</small>
+                <strong id="distance">0.00</strong>
+                <span class="unit">km</span>
+            </div>
+
+            <div class="stat">
+                <small>TIEMPO</small>
+                <strong id="time">00:00</strong>
+            </div>
+
+            <div class="stat">
+                <small>VELOCIDAD</small>
+                <strong id="speed">0.0</strong>
+                <span class="unit">km/h</span>
+            </div>
+
+            <div class="stat">
+                <small>RITMO</small>
+                <strong id="pace">--:--</strong>
+                <span class="unit">min/km</span>
+            </div>
+
+        </div>
+
+        <div class="big-controls">
+
+            <button id="pauseBtn" class="circleBtn" aria-label="Pausar caminata">
+                ⏸
+            </button>
+
+            <button id="startBtn" class="circleBtn" aria-label="Iniciar caminata" disabled>
+                ▶
+            </button>
+
+            <button id="stopBtn" class="circleBtn" aria-label="Terminar caminata">
+                ■
+            </button>
+
+        </div>
+
+        <div class="message" id="message">
+            Pulsa el botón para comenzar
+        </div>
+
+    </section>
+
+</div>
+
+<div class="view" id="view-grupos">
+    <div class="simple-view">
+        <span class="soon-badge">PRÓXIMAMENTE</span>
+        <h2>Grupos</h2>
+        <p>Aquí podrás unirte a grupos de caminata con amigos o retos comunitarios.</p>
+    </div>
+</div>
+
+<div class="view" id="view-tu">
+    <div class="simple-view">
+        <h2>Tú</h2>
+
+        <div class="profile-card">
+
+            <div class="name-row">
+                <input type="text" id="profileName" placeholder="Tu nombre" value="Fer">
+            </div>
+
+            <div class="profile-stats">
+                <div class="stat">
+                    <small>CAMINATAS</small>
+                    <strong id="profileWalks">0</strong>
+                </div>
+                <div class="stat">
+                    <small>KM TOTALES</small>
+                    <strong id="profileKm">0.0</strong>
+                </div>
+                <div class="stat">
+                    <small>TIEMPO TOTAL</small>
+                    <strong id="profileTime">00:00</strong>
+                </div>
+            </div>
+
+        </div>
+
+        <p class="session-note">Tus caminatas se guardan en este navegador (no en la nube ni en una cuenta) — si borras los datos del sitio o usas otro dispositivo, no las verás.</p>
+
+        <button id="clearHistoryBtn" class="danger-link">Borrar todo mi historial</button>
 
     </div>
-
-    <div class="message" id="message">
-        Pulsa el botón para comenzar
-    </div>
-
-</section>
+</div>
 
 <div class="summary" id="summary">
 
     <div class="summary-card">
 
-        <h2>🎉 Caminata terminada</h2>
+        <h2>Caminata terminada</h2>
 
         <div class="summary-grid">
 
@@ -665,6 +1000,64 @@ button:disabled{
 
     </div>
 
+</div>
+
+<div class="summary" id="warmupModal">
+
+    <div class="warmup-card" id="warmupIntro">
+
+        <h2>Calentamiento</h2>
+
+        <p>Un calentamiento corto antes de caminar ayuda a preparar tus músculos y reduce el riesgo de lesiones. Son 3 pasos de 30 segundos cada uno.</p>
+
+        <div class="warmup-actions">
+            <button id="skipWarmup">Saltar</button>
+            <button id="startWarmup">Empezar</button>
+        </div>
+
+    </div>
+
+    <div class="warmup-card" id="warmupRunning" style="display:none;">
+
+        <h2>Calentamiento</h2>
+
+        <div class="warmup-step">
+            <div class="step-name" id="warmupStepName">Estiramiento de piernas</div>
+            <div class="step-count" id="warmupStepCount">30</div>
+            <div class="warmup-progress">
+                <div class="warmup-progress-bar" id="warmupProgressBar"></div>
+            </div>
+        </div>
+
+        <div class="warmup-actions">
+            <button id="skipToWalk">Saltar al final</button>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="tabbar">
+    <button class="tab-item" id="tabInicio" data-view="view-inicio">
+        <span class="tab-icon">⌂</span>
+        Inicio
+    </button>
+    <button class="tab-item" id="tabMapas" data-view="view-mapas">
+        <span class="tab-icon">▦</span>
+        Mapas
+    </button>
+    <button class="tab-item record active" id="tabRegistrar" data-view="view-registrar">
+        <span class="tab-icon">●</span>
+        Registrar
+    </button>
+    <button class="tab-item" id="tabGrupos" data-view="view-grupos">
+        <span class="tab-icon">◈</span>
+        Grupos
+    </button>
+    <button class="tab-item" id="tabTu" data-view="view-tu">
+        <span class="tab-icon">◉</span>
+        Tú
+    </button>
 </div>
 
 <script>
@@ -734,6 +1127,11 @@ let timerInterval = null;
 
 let wakeLock = null;
 
+/* Auto-pausa cuando se bloquea la pantalla o la app pasa a
+   segundo plano (los navegadores detienen el GPS ahí). */
+let hiddenAt = null;
+let autoPausedByBackground = false;
+
 /* Ruta personalizada */
 let planningMode = false;
 let planPoints = [];
@@ -745,6 +1143,13 @@ let hasPlan = false;
 let baseLayers = {};
 let currentMapType = "standard";
 let tilted = false;
+
+/* Totales acumulados y guardados en localStorage, para la
+   pestaña "Tú" e "Inicio" */
+let sessionWalks = 0;
+let sessionKm = 0;
+let sessionSeconds = 0;
+let walkHistory = [];
 
 /* Precisión mínima aceptable (metros). Lecturas peores se ignoran
    para el cálculo de distancia, aunque el marcador sí se actualiza. */
@@ -947,13 +1352,48 @@ function releaseWakeLock(){
 
 document.addEventListener("visibilitychange", () => {
 
+    if(document.visibilityState === "hidden"){
+
+        if(tracking && !paused){
+
+            autoPausedByBackground = true;
+            hiddenAt = Date.now();
+
+            pauseWalk("Caminata pausada automáticamente (pantalla bloqueada).");
+
+        }
+
+        return;
+
+    }
+
+    /* document.visibilityState === "visible" */
+
     if(
         tracking &&
-        !paused &&
-        document.visibilityState === "visible"
+        !paused
     ){
 
         requestWakeLock();
+
+    }
+
+    if(autoPausedByBackground){
+
+        const gapSeconds = (Date.now() - hiddenAt) / 1000;
+
+        autoPausedByBackground = false;
+        hiddenAt = null;
+
+        setStatusBanner(
+            "Pausado por bloqueo de pantalla (" + formatTime(gapSeconds) + ")",
+            "warn"
+        );
+
+        message.textContent =
+            "El navegador detuvo el GPS al bloquear la pantalla durante " +
+            formatTime(gapSeconds) +
+            ". No se registró esa parte. Pulsa el botón de reanudar cuando quieras seguir.";
 
     }
 
@@ -1545,36 +1985,13 @@ function handleGPSError(error){
    INICIAR
    ========================================= */
 
-startBtn.addEventListener("click", async ()=>{
-
-    if(!mapReady){
-
-        return;
-
-    }
-
-    if(!navigator.geolocation){
-
-        alert("Tu navegador no admite geolocalización.");
-
-        return;
-    }
-
-    if(!window.isSecureContext){
-
-        alert("Fer Walk necesita una conexión segura (HTTPS) para usar el GPS.");
-
-        return;
-    }
-
-    if(planningMode){
-
-        setPlanningMode(false);
-
-    }
+async function beginWalk(){
 
     tracking = true;
     paused = false;
+
+    autoPausedByBackground = false;
+    hiddenAt = null;
 
     route = [];
     totalDistance = 0;
@@ -1611,6 +2028,38 @@ startBtn.addEventListener("click", async ()=>{
         1000
     );
 
+}
+
+startBtn.addEventListener("click", async ()=>{
+
+    if(!mapReady){
+
+        return;
+
+    }
+
+    if(!navigator.geolocation){
+
+        alert("Tu navegador no admite geolocalización.");
+
+        return;
+    }
+
+    if(!window.isSecureContext){
+
+        alert("Fer Walk necesita una conexión segura (HTTPS) para usar el GPS.");
+
+        return;
+    }
+
+    if(planningMode){
+
+        setPlanningMode(false);
+
+    }
+
+    openWarmup();
+
 });
 
 
@@ -1618,37 +2067,53 @@ startBtn.addEventListener("click", async ()=>{
    PAUSAR
    ========================================= */
 
+function pauseWalk(reason){
+
+    if(!tracking || paused) return;
+
+    paused = true;
+    pauseStarted = Date.now();
+
+    pauseBtn.textContent = "▶";
+
+    message.textContent =
+        reason || "Caminata pausada.";
+
+    releaseWakeLock();
+
+}
+
+function resumeWalk(){
+
+    if(!tracking || !paused) return;
+
+    paused = false;
+
+    pausedTime +=
+        Date.now() - pauseStarted;
+
+    lastPosition = null;
+
+    pauseBtn.textContent = "⏸";
+
+    message.textContent =
+        "Caminata reanudada.";
+
+    requestWakeLock();
+
+}
+
 pauseBtn.addEventListener("click",()=>{
 
     if(!tracking) return;
 
     if(!paused){
 
-        paused = true;
-        pauseStarted = Date.now();
-
-        pauseBtn.textContent = "▶";
-
-        message.textContent =
-            "Caminata pausada.";
-
-        releaseWakeLock();
+        pauseWalk();
 
     }else{
 
-        paused = false;
-
-        pausedTime +=
-            Date.now() - pauseStarted;
-
-        lastPosition = null;
-
-        pauseBtn.textContent = "⏸";
-
-        message.textContent =
-            "Caminata reanudada.";
-
-        requestWakeLock();
+        resumeWalk();
 
     }
 
@@ -1719,6 +2184,29 @@ stopBtn.addEventListener("click",()=>{
         route.length;
 
     summary.style.display = "flex";
+
+    sessionWalks += 1;
+    sessionKm += totalDistance / 1000;
+    sessionSeconds += elapsed;
+
+    walkHistory.push({
+        date: new Date().toLocaleDateString("es-MX", {
+            day:"numeric", month:"short", year:"numeric"
+        }),
+        km: totalDistance / 1000,
+        time: formatTime(elapsed),
+        avgSpeed: averageSpeed
+    });
+
+    if(walkHistory.length > MAX_HISTORY_ITEMS){
+
+        walkHistory = walkHistory.slice(-MAX_HISTORY_ITEMS);
+
+    }
+
+    updateProfileStats();
+    renderHistory();
+    saveToStorage();
 
     startBtn.style.display = "flex";
     pauseBtn.style.display = "none";
@@ -1863,6 +2351,290 @@ async function ensureLeaflet(){
 
 
 /* =========================================
+   BARRA DE PESTAÑAS
+   ========================================= */
+
+const tabButtons = document.querySelectorAll(".tab-item");
+
+function switchTab(viewId){
+
+    document.querySelectorAll(".view").forEach(v => {
+
+        v.classList.toggle("active", v.id === viewId);
+
+    });
+
+    tabButtons.forEach(b => {
+
+        b.classList.toggle("active", b.dataset.view === viewId);
+
+    });
+
+    /* El mapa de Leaflet necesita recalcular su tamaño cuando
+       vuelve a ser visible, porque mientras estuvo oculto no
+       pudo medir su contenedor correctamente. */
+    if(viewId === "view-registrar" && map){
+
+        setTimeout(() => map.invalidateSize(), 50);
+
+    }
+
+}
+
+tabButtons.forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+        switchTab(btn.dataset.view);
+
+    });
+
+});
+
+
+/* =========================================
+   ALMACENAMIENTO LOCAL
+
+   Guarda tu nombre, tus totales y el historial de caminatas
+   en localStorage, es decir, en este navegador/dispositivo.
+   No hay cuenta ni nube: si borras los datos del sitio o
+   cambias de navegador o teléfono, no vas a ver tu historial.
+   Si localStorage no está disponible (modo privado, algunos
+   navegadores antiguos), la app sigue funcionando igual pero
+   sin guardar nada entre sesiones.
+   ========================================= */
+
+const STORAGE_KEY = "ferwalk_data_v1";
+const MAX_HISTORY_ITEMS = 50;
+
+function loadFromStorage(){
+
+    try{
+
+        const raw = localStorage.getItem(STORAGE_KEY);
+
+        if(!raw) return;
+
+        const data = JSON.parse(raw);
+
+        if(typeof data.name === "string") profileNameInput.value = data.name;
+        if(typeof data.walks === "number") sessionWalks = data.walks;
+        if(typeof data.km === "number") sessionKm = data.km;
+        if(typeof data.seconds === "number") sessionSeconds = data.seconds;
+        if(Array.isArray(data.history)) walkHistory = data.history;
+
+    }catch(e){
+
+        /* localStorage no disponible o datos corruptos: seguimos
+           con los valores por defecto sin romper la app. */
+
+    }
+
+}
+
+function saveToStorage(){
+
+    try{
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            name: profileNameInput.value,
+            walks: sessionWalks,
+            km: sessionKm,
+            seconds: sessionSeconds,
+            history: walkHistory
+        }));
+
+    }catch(e){
+
+        /* Sin espacio, modo privado, etc. No es crítico: la app
+           sigue funcionando, solo no persiste esta vez. */
+
+    }
+
+}
+
+
+/* =========================================
+   PERFIL ("TÚ")
+   ========================================= */
+
+const profileWalksEl = document.getElementById("profileWalks");
+const profileKmEl = document.getElementById("profileKm");
+const profileTimeEl = document.getElementById("profileTime");
+const profileNameInput = document.getElementById("profileName");
+const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+const historyListEl = document.getElementById("historyList");
+
+function updateProfileStats(){
+
+    profileWalksEl.textContent = sessionWalks;
+    profileKmEl.textContent = sessionKm.toFixed(1);
+    profileTimeEl.textContent = formatTime(sessionSeconds);
+
+}
+
+function renderHistory(){
+
+    if(walkHistory.length === 0){
+
+        historyListEl.innerHTML =
+            '<div class="history-empty">Aún no tienes caminatas registradas. Ve a la pestaña "Registrar" para empezar la primera.</div>';
+
+        return;
+
+    }
+
+    historyListEl.innerHTML = walkHistory
+        .slice()
+        .reverse()
+        .map(w => (
+            '<div class="history-item">' +
+                '<div>' +
+                    '<div class="history-date">' + w.date + '</div>' +
+                    '<div class="history-main">' + w.km.toFixed(2) + ' km</div>' +
+                    '<div class="history-sub">' + w.time + ' • ' + w.avgSpeed.toFixed(1) + ' km/h</div>' +
+                '</div>' +
+            '</div>'
+        ))
+        .join("");
+
+}
+
+profileNameInput.addEventListener("change", saveToStorage);
+
+clearHistoryBtn.addEventListener("click", () => {
+
+    if(!confirm("¿Borrar todo tu historial de caminatas guardado en este navegador? No se puede deshacer.")){
+
+        return;
+
+    }
+
+    sessionWalks = 0;
+    sessionKm = 0;
+    sessionSeconds = 0;
+    walkHistory = [];
+
+    updateProfileStats();
+    renderHistory();
+    saveToStorage();
+
+});
+
+
+/* =========================================
+   CALENTAMIENTO
+   ========================================= */
+
+const warmupModal = document.getElementById("warmupModal");
+const warmupIntro = document.getElementById("warmupIntro");
+const warmupRunning = document.getElementById("warmupRunning");
+const warmupStepName = document.getElementById("warmupStepName");
+const warmupStepCount = document.getElementById("warmupStepCount");
+const warmupProgressBar = document.getElementById("warmupProgressBar");
+const skipWarmupBtn = document.getElementById("skipWarmup");
+const startWarmupBtn = document.getElementById("startWarmup");
+const skipToWalkBtn = document.getElementById("skipToWalk");
+
+const WARMUP_STEPS = [
+    { name:"Estiramiento de piernas", seconds:30 },
+    { name:"Marcha en el lugar",      seconds:30 },
+    { name:"Respiración profunda",    seconds:30 }
+];
+
+let warmupInterval = null;
+let warmupStepIndex = 0;
+let warmupSecondsLeft = 0;
+
+function openWarmup(){
+
+    warmupIntro.style.display = "block";
+    warmupRunning.style.display = "none";
+
+    warmupModal.style.display = "flex";
+
+}
+
+function closeWarmupAndBeginWalk(){
+
+    clearInterval(warmupInterval);
+    warmupInterval = null;
+
+    warmupModal.style.display = "none";
+
+    beginWalk();
+
+}
+
+function runWarmupStep(){
+
+    if(warmupStepIndex >= WARMUP_STEPS.length){
+
+        closeWarmupAndBeginWalk();
+
+        return;
+
+    }
+
+    const step = WARMUP_STEPS[warmupStepIndex];
+
+    warmupSecondsLeft = step.seconds;
+
+    warmupStepName.textContent = step.name;
+    warmupStepCount.textContent = warmupSecondsLeft;
+    warmupProgressBar.style.width = "0%";
+
+    clearInterval(warmupInterval);
+
+    warmupInterval = setInterval(() => {
+
+        warmupSecondsLeft -= 1;
+
+        warmupStepCount.textContent = Math.max(warmupSecondsLeft, 0);
+
+        const progress =
+            ((step.seconds - warmupSecondsLeft) / step.seconds) * 100;
+
+        warmupProgressBar.style.width =
+            Math.min(progress, 100) + "%";
+
+        if(warmupSecondsLeft <= 0){
+
+            warmupStepIndex += 1;
+
+            runWarmupStep();
+
+        }
+
+    }, 1000);
+
+}
+
+skipWarmupBtn.addEventListener("click", () => {
+
+    closeWarmupAndBeginWalk();
+
+});
+
+startWarmupBtn.addEventListener("click", () => {
+
+    warmupIntro.style.display = "none";
+    warmupRunning.style.display = "block";
+
+    warmupStepIndex = 0;
+
+    runWarmupStep();
+
+});
+
+skipToWalkBtn.addEventListener("click", () => {
+
+    closeWarmupAndBeginWalk();
+
+});
+
+
+/* =========================================
    INICIALIZACIÓN
    ========================================= */
 
@@ -1973,6 +2745,10 @@ async function initApp(){
     }
 
 }
+
+loadFromStorage();
+updateProfileStats();
+renderHistory();
 
 initApp();
 
